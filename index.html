@@ -2,109 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Corner Button → Fullscreen Popup</title>
+  <title>Open Popup in New Tab</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <style>
-    :root{
-      /* CHANGE BACKGROUND COLOR HERE */
-      --page-bg: #0f172a;         /* page background (dark navy) */
-      --overlay-bg: rgba(0,0,0,.65); /* dim background behind the popup */
-      --panel-bg: #111827;        /* popup panel background */
-      --text: #e5e7eb;            /* main text color */
-      --muted: #9ca3af;
-      --accent: #2563eb;          /* button color */
-      --line: #1f2937;
-    }
-
-    *{ box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      background: var(--page-bg);
-      color: var(--text);
-      font-family: system-ui, Segoe UI, Arial, sans-serif;
-      /* OPTIONAL: use an image instead of color
-      background: url('YOUR_IMAGE_URL.jpg') center/cover no-repeat fixed;
-      */
-    }
-
-    /* Top-right floating button (only UI on the page) */
+    :root{ --page-bg:#0f172a; --accent:#2563eb; --line:#1f2937; }
+    html, body { height:100%; }
+    body { margin:0; background: var(--page-bg); }
     #cornerBtn{
       position: fixed; top: 12px; right: 12px;
       width: 44px; height: 44px; border-radius: 9999px;
       border: 1px solid var(--line);
-      background: var(--accent);
-      color: #fff; font-size: 22px; cursor: pointer;
+      background: var(--accent); color: #fff; font-size: 22px; cursor: pointer;
       box-shadow: 0 6px 18px rgba(0,0,0,.25);
     }
-
-    /* Fullscreen overlay */
-    #overlay{
-      display: none; position: fixed; inset: 0; z-index: 40;
-      background: var(--overlay-bg);
-    }
-
-    /* Centered panel */
-    #panel{
-      display: none; position: fixed; z-index: 50;
-      top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: min(92vw, 560px);
-      background: var(--panel-bg);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 18px;
-      box-shadow: 0 30px 60px rgba(0,0,0,.45);
-    }
-
-    .title { font-size: 18px; font-weight: 700; margin: 0 0 8px 0; }
-    .text  { color: var(--muted); line-height: 1.5; }
-
-    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
-    .btn {
-      padding: 10px 14px; border-radius: 12px;
-      border: 1px solid var(--line); background:#0f172a; color: var(--text);
-      cursor: pointer;
-    }
-    .btn:hover { background:#162440; }
   </style>
 </head>
 <body>
-
-  <!-- Only the button is visible initially -->
   <button id="cornerBtn" aria-label="Open">⋮</button>
 
-  <!-- Fullscreen overlay + panel -->
-  <div id="overlay"></div>
-  <div id="panel" role="dialog" aria-modal="true" aria-labelledby="title">
-    <h2 class="title" id="title">Your Title Here</h2>
-    <p class="text" id="content">
-      Your content goes here. You said you updated the text—edit it right here.
-    </p>
-    <div class="actions">
-      <button class="btn" id="closeBtn">Close</button>
-    </div>
-  </div>
-
   <script>
-    const openBtn  = document.getElementById('cornerBtn');
-    const overlay  = document.getElementById('overlay');
-    const panel    = document.getElementById('panel');
-    const closeBtn = document.getElementById('closeBtn');
-
-    function openFull() {
-      overlay.style.display = 'block';
-      panel.style.display   = 'block';
-    }
-    function closeFull() {
-      overlay.style.display = 'none';
-      panel.style.display   = 'none';
-    }
-
-    openBtn.addEventListener('click', openFull);
-    closeBtn.addEventListener('click', closeFull);
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeFull(); });
-    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeFull(); });
+    document.getElementById('cornerBtn').addEventListener('click', () => {
+      // Opens popup.html in a new tab
+      window.open('popup.html', '_blank', 'noopener');
+    });
   </script>
 </body>
 </html>
