@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Top‑Right Popup</title>
+<style>
+  :root{--bg:#0f172a;--fg:#e2e8f0;--panel:#111827;--muted:#94a3b8;--line:#233047;--accent:#3b82f6;--accent2:#22c55e}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--fg)}
+  .container{padding:24px;max-width:800px;margin:64px auto}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  h1{margin:0 0 8px 0;font-size:22px}
+  p{color:var(--muted);margin:6px 0}
+  .top-right-btn{position:fixed;top:12px;right:12px;width:46px;height:46px;border-radius:9999px;background:#1e293b;color:var(--fg);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.25);user-select:none}
+  .top-right-btn:hover{background:#25364f}
+  .backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,.6);z-index:50;padding:18px}
+  .modal{width:min(92vw,520px);background:#0b1220;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 30px 60px rgba(0,0,0,.45)}
+  .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .title{font-size:18px;font-weight:700}
+  .close{background:transparent;color:#a8b3c6;border:none;font-size:24px;cursor:pointer;line-height:1}
+  .btn{display:inline-block;padding:10px 14px;border-radius:12px;border:1px solid var(--line);cursor:pointer;background:#0f172a;color:var(--fg);margin-right:8px;margin-top:8px}
+  .btn:hover{background:#162440}
+  .btn.primary{border-color:var(--accent)}
+  .btn.success{border-color:var(--accent2)}
+  .settings{margin-top:12px;padding:12px;border:1px dashed var(--line);border-radius:12px;display:none}
+  .field{margin-bottom:10px}
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+  input[type="text"],textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#0b1220;color:var(--fg);resize:vertical}
+  .hint{font-size:12px;color:var(--muted)}
+  .sep{height:1px;background:var(--line);margin:12px 0}
+</style>
+</head>
+<body>
+  <button class="top-right-btn" id="menuBtn" aria-label="Open menu" title="Open menu">⋮</button>
+
+  <div class="container">
+    <div class="card">
+      <h1>Top‑Right Popup (Download & Run)</h1>
+      <p>Click the round button in the top‑right corner to open the popup. Use the gear to change the popup title and content. Your choices are saved on this computer.</p>
+      <p class="hint">Tip: Save this page (File → Save Page As) to run it offline, or download the single HTML file from the “Download” button on the site.</p>
+    </div>
+  </div>
+
+  <div class="backdrop" id="backdrop" role="dialog" aria-modal="true" aria-labelledby="popupTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="title" id="popupTitle">Quick Menu</div>
+        <button class="close" id="closeBtn" aria-label="Close">×</button>
+      </div>
+
+      <div id="popupContent" style="white-space:pre-wrap; line-height:1.45;">
+        Hello! This is your customizable popup content.
+      </div>
+
+      <div class="sep"></div>
+
+      <div>
+        <button class="btn primary" id="settingsToggle">⚙ Settings</button>
+        <button class="btn success" id="actionBtn">Run Action</button>
+      </div>
+
+      <div class="settings" id="settingsPanel">
+        <div class="field">
+          <label for="titleInput">Popup title</label>
+          <input type="text" id="titleInput" placeholder="Quick Menu" />
+        </div>
+        <div class="field">
+          <label for="contentInput">Popup content</label>
+          <textarea id="contentInput" rows="4" placeholder="Type what should show in the popup..."></textarea>
+        </div>
+        <div class="field">
+          <label for="remoteUrl">Optional: Load content from a remote JSON URL</label>
+          <input type="text" id="remoteUrl" placeholder="https://example.com/popup.json" />
+          <div class="hint">If provided, this URL should return JSON like: { "title": "Hello", "content": "Text here" }</div>
+        </div>
+        <button class="btn success" id="saveBtn">Save</button>
+        <button class="btn" id="loadRemoteBtn">Fetch From URL</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const LS_KEY = "topright_popup_settings_v1";
+  const state = { title:"Quick Menu", content:"Hello! This is your customizable popup content.", remoteUrl:"" };
+
+  function loadState(){ try{ const raw=localStorage.getItem(LS_KEY); if(raw) Object.assign(state, JSON.parse(raw)); }catch{} }
+  function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+
+  const btn=document.getElementById('menuBtn'),backdrop=document.getElementById('backdrop'),closeBtn=document.getElementById('closeBtn');
+  const settingsPanel=document.getElementById('settingsPanel'),settingsToggle=document.getElementById('settingsToggle');
+  const titleEl=document.getElementById('popupTitle'),contentEl=document.getElementById('popupContent');
+  const titleInput=document.getElementById('titleInput'),contentInput=document.getElementById('contentInput'),remoteUrlInput=document.getElementById('remoteUrl');
+  const saveBtn=document.getElementById('saveBtn'),loadRemoteBtn=document.getElementById('loadRemoteBtn'),actionBtn=document.getElementById('actionBtn');
+
+  function applyState(){ titleEl.textContent=state.title||"Quick Menu"; contentEl.textContent=state.content||""; titleInput.value=state.title; contentInput.value=state.content; remoteUrlInput.value=state.remoteUrl; }
+  function openModal(){ backdrop.style.display='flex'; }
+  function closeModal(){ backdrop.style.display='none'; }
+
+  btn.addEventListener('click', openModal);
+  closeBtn.addEventListener('click', closeModal);
+  backdrop.addEventListener('click', e=>{ if(e.target===backdrop) closeModal(); });
+  settingsToggle.addEventListener('click', ()=>{ const d=getComputedStyle(settingsPanel).display; settingsPanel.style.display=(d==='none')?'block':'none'; });
+  saveBtn.addEventListener('click', ()=>{ state.title=titleInput.value.trim()||"Quick Menu"; state.content=contentInput.value; state.remoteUrl=remoteUrlInput.value.trim(); saveState(); applyState(); alert("Saved!"); });
+  loadRemoteBtn.addEventListener('click', async ()=>{ const url=remoteUrlInput.value.trim(); if(!url) return alert("Enter a URL first."); try{ const res=await fetch(url,{cache:'no-store'}); if(!res.ok) throw new Error(res.status+" "+res.statusText); const json=await res.json(); if(json.title) state.title=String(json.title); if(json.content) state.content=String(json.content); saveState(); applyState(); alert("Loaded from remote URL."); }catch(e){ alert("Failed to load remote content: "+e.message); }});
+  actionBtn.addEventListener('click', ()=>{ alert("Action clicked!\n\n"+(state.content||"")); });
+
+  loadState(); applyState();
+</script>
+</body>
+</html>
