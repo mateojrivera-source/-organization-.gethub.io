@@ -1,87 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Top Right Popup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    :root {
+      --bg:#0f172a; --panel:#111827; --text:#e5e7eb; --muted:#9ca3af;
+      --accent:#2563eb; --line:#1f2937; --success:#22c55e;
+    }
+    * { box-sizing:border-box; }
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: white;
-      height: 100vh;
+      margin:0; background:var(--bg); color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      min-height:100vh;
     }
 
-    /* Top-right button */
+    /* Top-right floating button */
     #cornerButton {
-      position: fixed;
-      top: 12px;
-      right: 12px;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: none;
-      background: #2563eb;
-      color: white;
-      font-size: 24px;
-      cursor: pointer;
+      position: fixed; top: 12px; right: 12px;
+      width: 44px; height: 44px; border-radius: 9999px;
+      border: 1px solid var(--line); background: var(--accent); color: #fff;
+      font-size: 22px; cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,.25);
     }
 
-    /* Dark background behind popup */
+    /* Page content (optional) */
+    .container { max-width: 880px; margin: 60px auto; padding: 0 20px; }
+    .card {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    h1 { margin: 0 0 8px 0; font-size: 22px; }
+    p { margin: 6px 0; color: var(--muted); }
+
+    /* Backdrop */
     #overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.6);
+      display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 40;
     }
 
-    /* Popup box */
+    /* Popup */
     #popup {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #111827;
-      padding: 20px;
-      border-radius: 12px;
-      width: 300px;
-      display: none;
+      display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: min(92vw, 520px); background: var(--panel); border: 1px solid var(--line);
+      border-radius: 14px; padding: 18px; z-index: 50; box-shadow: 0 30px 60px rgba(0,0,0,.45);
+    }
+    .popup-header { display:flex; align-items:center; justify-content:space-between; margin-bottom: 10px; }
+    .popup-title { font-size: 18px; font-weight: 700; }
+    .icon-btn {
+      background: transparent; border: 1px solid var(--line); color: var(--text);
+      border-radius: 10px; padding: 6px 10px; cursor:pointer;
+    }
+    .icon-btn:hover { background:#0b1220; }
+
+    .btn {
+      display:inline-block; padding:10px 14px; border-radius:12px; border:1px solid var(--line);
+      cursor:pointer; background:#0f172a; color:var(--text); margin-right:8px; margin-top:8px;
+    }
+    .btn:hover { background:#162440; }
+    .btn.primary { border-color: var(--accent); }
+    .btn.success { border-color: var(--success); }
+    .close-btn { padding: 8px 12px; }
+
+    .settings { margin-top: 12px; padding: 12px; border:1px dashed var(--line); border-radius: 12px; display:none; }
+    .field { margin-bottom: 10px; }
+    label { display:block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+    input[type="text"], textarea {
+      width: 100%; padding: 10px 12px; border-radius: 10px; border:1px solid var(--line);
+      background:#0b1220; color: var(--text); resize: vertical;
     }
 
-    button {
-      padding: 8px 12px;
-      margin-top: 12px;
-      cursor: pointer;
-    }
+    .footer-actions { display:flex; gap:8px; flex-wrap: wrap; margin-top: 10px; }
   </style>
 </head>
 <body>
 
-  <button id="cornerButton">⋮</button>
+  <!-- Top-right menu button -->
+  <button id="cornerButton" aria-label="Open menu">⋮</button>
 
-  <div id="overlay"></div>
+  <!-- (Optional) Landing content -->
+  <div class="container">
+    <div class="card">
+      <h1>Top‑Right Popup</h1>
+      <p>Click the round button in the top‑right corner to open the popup. Use the gear icon to change the title and content. Your choices are saved on this device.</p>
+    </div>
+  </div>
 
-  <div id="popup">
-    <h2>Popup</h2>
-    <p>This is the popup content.</p>
-    <button onclick="closePopup()">Close</button>
+  <!-- Backdrop -->
+  <div id="overlay" aria-hidden="true"></div>
+
+  <!-- Popup -->
+  <div id="popup" role="dialog" aria-modal="true" aria-labelledby="popupTitle">
+    <div class="popup-header">
+      <div class="popup-title" id="popupTitle">Popup</div>
+      <button class="icon-btn" id="settingsToggle" aria-label="Open settings">⚙</button>
+    </div>
+
+    <div id="popupContent" style="white-space:pre-wrap; line-height:1.45;">
+      This is the popup content.
+    </div>
+
+    <div class="settings" id="settingsPanel">
+      <div class="field">
+        <label for="titleInput">Title</label>
+        <input type="text" id="titleInput" placeholder="Popup" />
+      </div>
+      <div class="field">
+        <label for="contentInput">Content</label>
+        <textarea id="contentInput" rows="4" placeholder="Type what should show in the popup..."></textarea>
+      </div>
+      <div class="footer-actions">
+        <button class="btn success" id="saveBtn">Save</button>
+        <button class="btn" id="resetBtn">Reset</button>
+      </div>
+    </div>
+
+    <div class="footer-actions">
+      <button class="btn close-btn" id="closeBtn">Close</button>
+    </div>
   </div>
 
   <script>
-    const button = document.getElementById("cornerButton");
-    const popup = document.getElementById("popup");
-    const overlay = document.getElementById("overlay");
+    // --- State + persistence ---
+    const LS_KEY = "topright_popup_settings_v1";
+    const state = { title:"Popup", content:"This is the popup content." };
 
-    button.onclick = () => {
-      popup.style.display = "block";
-      overlay.style.display = "block";
-    };
-
-    function closePopup() {
-      popup.style.display = "none";
-      overlay.style.display = "none";
+    function loadState() {
+      try { const raw = localStorage.getItem(LS_KEY); if(raw) Object.assign(state, JSON.parse(raw)); } catch {}
     }
-  </script>
+    function saveState() { localStorage.setItem(LS_KEY, JSON.stringify(state)); }
 
+    // --- Elements ---
+    const cornerButton = document.getElementById('cornerButton');
+    const overlay = document.getElementById('overlay');
+    const popup = document.getElementById('popup');
+    const popupTitle = document.getElementById('popupTitle');
+    const popupContent = document.getElementById('popupContent');
+    const settingsToggle = document.getElementById('settingsToggle');
+    const settingsPanel = document.getElementById('settingsPanel');
+    const titleInput = document.getElementById('titleInput');
+    const contentInput = document.getElementById('contentInput');
+    const saveBtn = document.getElementById('saveBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const closeBtn = document.getElementById('closeBtn');
+
+    function applyState() {
+      popupTitle.textContent = state.title;
+      popupContent.textContent = state.content;
+      titleInput.value = state.title;
+      contentInput.value = state.content;
+    }
+
+    function openPopup() {
+      overlay.style.display = 'block';
+      popup.style.display = 'block';
+    }
+    function closePopup() {
+      overlay.style.display = 'none';
+      popup.style.display = 'none';
+      // hide settings if open
+      settingsPanel.style.display = 'none';
+    }
+
+    function toggleSettings() {
+      const d = getComputedStyle(settingsPanel).display;
+      settingsPanel.style.display = (d === 'none') ? 'block' : 'none';
+    }
+
+    // --- Wire up UI ---
+    cornerButton.addEventListener('click', openPopup);
+    closeBtn.addEventListener('click', closePopup);
+
+    // Click outside to close
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closePopup();
+    });
+
+    // Esc to close
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closePopup();
+    });
+
+    settingsToggle.addEventListener('click', toggleSettings);
+
+    saveBtn.addEventListener('click', () => {
+      state.title = titleInput.value.trim() || 'Popup';
+      state.content = contentInput.value;
+      saveState();
+      applyState();
+      alert('Saved!');
+    });
+
+    resetBtn.addEventListener('click', () => {
+      state.title = 'Popup';
+      state.content = 'This is the popup content.';
+      saveState();
+      applyState();
+      alert('Reset!');
+    });
+
+    // Init
+    loadState();
+    applyState();
+  </script>
 </body>
 </html>
