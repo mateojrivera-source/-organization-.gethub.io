@@ -1,87 +1,80 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Popup Cover</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    :root{ --page-bg:#0f172a; --accent:#2563eb; --line:#1f2937; }
-    html, body { height:100%; }
-    body { margin:0; background: var(--page-bg); }
+<style>
+  /* Corner button */
+  #cornerBtn {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    width: 44px;
+    height: 44px;
+    border-radius: 9999px;
+    border: 1px solid #1f2937;
+    background: #2563eb;
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0,0,0,.25);
+    z-index: 10000;
+  }
 
-    /* Corner button */
-    #cornerBtn{
-      position: fixed; top: 12px; right: 12px;
-      width: 44px; height: 44px; border-radius: 9999px;
-      border: 1px solid var(--line);
-      background: var(--accent); color: #fff; font-size: 22px; cursor: pointer;
-      box-shadow: 0 6px 18px rgba(0,0,0,.25);
-      z-index: 10000;
-    }
+  /* Fullscreen overlay */
+  #popupOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: white;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
 
-    /* Fullscreen overlay */
-    #popupOverlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: white;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
+  /* Image inside overlay */
+  #popupImage {
+    max-width: 95%;
+    max-height: 95%;
+    object-fit: contain;
+  }
 
-    /* Image inside overlay */
-    #popupImage {
-      max-width: 95%;
-      max-height: 95%;
-      object-fit: contain;
-    }
+  /* Close button */
+  #closePopup {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 24px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+</style>
 
-    /* Close button */
-    #closePopup {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      font-size: 24px;
-      background: #2563eb;
-      color: white;
-      border: none;
-      padding: 10px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
+<!-- Corner button -->
+<button id="cornerBtn" aria-label="Open">⋮</button>
 
-  <button id="cornerBtn" aria-label="Open">⋮</button>
+<!-- Fullscreen popup -->
+<div id="popupOverlay">
+  <button id="closePopup">X</button>
+  <img id="popupImage" src="" alt="Popup Content">
+</div>
 
-  <!-- Fullscreen popup -->
-  <div id="popupOverlay">
-    <button id="closePopup">X</button>
-    <img id="popupImage" src="" alt="Popup Content">
-  </div>
+<script>
+  // Open popup
+  document.getElementById('cornerBtn').addEventListener('click', () => {
+    const overlay = document.getElementById('popupOverlay');
+    const img = document.getElementById('popupImage');
 
-  <script>
-    // When corner button is clicked
-    document.getElementById('cornerBtn').addEventListener('click', () => {
-      const overlay = document.getElementById('popupOverlay');
-      const img = document.getElementById('popupImage');
+    // CHANGE THIS to your actual image URL
+    img.src = 'worksheet.jpg';
 
-      // CHANGE THIS to whatever image you want to show
-      img.src = 'worksheet.jpg';
+    overlay.style.display = 'flex';
+  });
 
-      overlay.style.display = 'flex';
-    });
-
-    // Close popup
-    document.getElementById('closePopup').addEventListener('click', () => {
-      document.getElementById('popupOverlay').style.display = 'none';
-    });
-  </script>
-
-</body>
-</html>
+  // Close popup
+  document.getElementById('closePopup').addEventListener('click', () => {
+    document.getElementById('popupOverlay').style.display = 'none';
+  });
+</script>
