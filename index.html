@@ -1,5 +1,4 @@
 <style>
-  /* Corner button */
   #cornerBtn {
     position: fixed;
     top: 12px;
@@ -16,7 +15,6 @@
     z-index: 10000;
   }
 
-  /* Fullscreen overlay */
   #popupOverlay {
     position: fixed;
     top: 0;
@@ -30,14 +28,12 @@
     z-index: 9999;
   }
 
-  /* Image inside overlay */
   #popupImage {
     max-width: 95%;
     max-height: 95%;
     object-fit: contain;
   }
 
-  /* Close button */
   #closePopup {
     position: absolute;
     top: 20px;
@@ -52,29 +48,27 @@
   }
 </style>
 
-<!-- Corner button -->
-<button id="cornerBtn" aria-label="Open">⋮</button>
+<button id="cornerBtn">⋮</button>
 
-<!-- Fullscreen popup -->
 <div id="popupOverlay">
   <button id="closePopup">X</button>
-  <img id="popupImage" src="" alt="Popup Content">
+  <img id="popupImage" src="" alt="">
 </div>
 
 <script>
-  // Open popup
-  document.getElementById('cornerBtn').addEventListener('click', () => {
+  // OPEN popup
+  document.getElementById('cornerBtn').onclick = function () {
     const overlay = document.getElementById('popupOverlay');
     const img = document.getElementById('popupImage');
 
-    // CHANGE THIS to your actual image URL
+    // IMPORTANT: This MUST be a direct image URL, not a link
     img.src = 'worksheet.jpg';
 
     overlay.style.display = 'flex';
-  });
+  };
 
-  // Close popup
-  document.getElementById('closePopup').addEventListener('click', () => {
+  // CLOSE popup
+  document.getElementById('closePopup').onclick = function () {
     document.getElementById('popupOverlay').style.display = 'none';
-  });
+  };
 </script>
